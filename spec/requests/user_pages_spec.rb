@@ -7,7 +7,7 @@ describe "User pages" do
   describe 'profile page' do
     # let(:user) { User.create(name: 'Ala', email: 'ala@123.pl', password: 'ala123',
                              # password_confirmation: 'ala123') }
-    let(:user) { FactoryGirl.create(:user) }
+    create_user
     before { visit user_path(user) }
     
     it { should have_content(user.name) }
@@ -68,8 +68,8 @@ describe "User pages" do
         let(:user) { User.find_by(email: user_email) }
         
         it { should have_title user.name }
-        it { should have_selector 'div.alert.alert-success', text: 'Welcome' }
-        it { should have_link 'Sign out' }
+        it { should have_success_message 'Welcome' }
+        it { should have_signout_link }
       end
     end
   end

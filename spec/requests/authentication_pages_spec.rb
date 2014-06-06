@@ -24,19 +24,19 @@ describe "Authentication" do
     end
     
     describe 'with valid information' do
-      let(:user) { FactoryGirl.create(:user) }
+      create_user
       before { valid_signin(user) }
       
-      it { should     have_title user.name }
-      it { should     have_link 'Profile',  href: user_path(user) }
-      it { should     have_link 'Sign out', href: signout_path }
-      it { should_not have_link 'Sign in',  href: signin_path }
+      it { should have_title user.name }
+      it { should have_link 'Profile', href: user_path(user) }
+      it { should have_signout_link }
+      it { should_not have_signin_link }
       
       describe 'followed by signout' do
         before { click_link 'Sign out' }
         
-        it { should have_selector '.alert.alert-success', text: 'signed out' }
-        it { should have_link 'Sign in',  href: signin_path }
+        it { should have_success_message 'signed out' }
+        it { should have_signin_link }
       end
     end
   end
