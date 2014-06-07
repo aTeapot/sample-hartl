@@ -51,13 +51,8 @@ describe "User pages" do
     end
     
     describe "with valid information" do
-      let(:user_email) { 'mietekbylzajety@o2.pl' }
-      before do
-        fill_in "Name",         with: "Gryzelda Ciołek"
-        fill_in "Email",        with: user_email
-        fill_in "Password",     with: "ala123"
-        fill_in "Confirmation", with: "ala123"
-      end
+      let(:new_user) { FactoryGirl.build(:user) }
+      before { fill_in_user_form new_user }
       
       it "should create a user" do
         expect { click_button submit }.to change(User, :count).by(1)
@@ -65,7 +60,7 @@ describe "User pages" do
       
       describe "after saving the user" do
         before { click_button submit }
-        let(:user) { User.find_by(email: user_email) }
+        let(:user) { User.find_by(email: new_user.email) }
         
         it { should have_title user.name }
         it { should have_success_message 'Welcome' }
@@ -74,4 +69,37 @@ describe "User pages" do
     end
   end
 
+  describe 'edit' do
+    create_user
+    before do
+      sign_in user
+      visit edit_user_path(user)
+    end
+    
+    describe 'page' do
+      it { should have_content 'Update your profile' }
+      it { should have_title 'Edit user' }
+      it { should have_link 'change', href: 'http://gravatar.com/emails' }
+    end
+    
+    describe 'with invalid information' do
+      before { click_button 'Save changes' }
+      
+      it { should have_content 'error' }
+    end
+    
+    describe 'with valid information' do
+      let(:edited_user) { FactoryGirl.build(:edited_user) }
+      before do
+        fill_in_user_form(edited_user)
+        click_button 'Save changes'
+      end
+      
+      it { should have_title edited_user.name }
+      it { should have_success_message 'updated' }
+      it { should have_signout_link }
+      specify { expect(user.reload.name).to  eq edited_user.name }
+      specify { expect(user.reload.email).to eq edited_user.email }
+    end
+  end
 end

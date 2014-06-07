@@ -1,16 +1,31 @@
 include ApplicationHelper
 
-def valid_signin(user)
-  fill_in "Email",    with: user.email
-  fill_in "Password", with: user.password
-  click_button 'Sign in'
+def sign_in(user, options={})
+  if options[:no_capybara]
+    # Sign in then not using Capybara
+    remember_token = User.new_remember_token
+    cookies[:remember_token] = remember_token
+    user.update_columns(remember_token: User.digest(remember_token))
+  else
+    visit signin_path
+    fill_in "Email",    with: user.email
+    fill_in "Password", with: user.password
+    click_button 'Sign in'
+  end
 end
 
 def create_user
   let(:user) { FactoryGirl.create(:user) }
 end
 
-flashes = [:success, :error]
+def fill_in_user_form(user)
+  fill_in "Name",         with: user.name
+  fill_in "Email",        with: user.email
+  fill_in "Password",     with: user.password
+  fill_in "Confirmation", with: user.password
+end
+
+flashes = [:success, :error, :notice]
 
 flashes.each do |type|
   RSpec::Matchers.define "have_#{type}_message" do |message|
