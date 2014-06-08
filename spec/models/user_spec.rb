@@ -13,6 +13,7 @@ describe User do
     it { should respond_to(:password_confirmation) }
     it { should respond_to(:remember_token) }
     it { should respond_to(:authenticate) }
+    it { should respond_to(:admin) }
   end
 
   it { should be_valid }
@@ -22,6 +23,7 @@ describe User do
   it { should validate_uniqueness_of(:email) }
   it { should ensure_length_of(:name).is_at_most(50) }
   it { should ensure_length_of(:password).is_at_least(6) }
+  it { should_not be_admin }
   
   context "email" do
     describe "when email format is invalid" do
@@ -90,5 +92,14 @@ describe User do
   describe 'remember token' do
     before { @user.save }
     its(:remember_token) { should_not be_blank }
+  end
+  
+  describe "with admin attribute set to 'true'" do
+    before do
+      @user.save!
+      @user.toggle! :admin
+    end
+    
+    it { should be_admin }
   end
 end
