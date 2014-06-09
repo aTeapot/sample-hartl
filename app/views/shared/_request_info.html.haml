@@ -1,0 +1,12 @@
+#request_info.debug_dump
+  %h3 request info
+  - methods = [:ip, :fullpath, :method]
+  %dl
+    - methods.each do |method|
+      %dt= method
+      %dd= request.send(method)
+    %dt  user agent
+    %dd= request.env["HTTP_USER_AGENT"]
+    %dt  flash
+    %dd= request.flash.inspect
+    

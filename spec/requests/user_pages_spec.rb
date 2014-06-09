@@ -143,6 +143,14 @@ describe "User pages" do
         it 'should be able to delete another user' do
           expect { click_link 'delete', match: :first }.to change(User, :count).by(-1)
         end
+        describe 'should not be able to destroy itself' do
+          before do
+            sign_in admin, no_capybara: true
+            delete user_path(admin)
+          end
+          specify { expect(response).to redirect_to(root_url) }
+          specify { expect(User.find_by id: admin.id).not_to be_nil }
+        end
       end
     end
   end

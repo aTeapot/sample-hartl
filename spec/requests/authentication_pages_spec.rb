@@ -40,6 +40,10 @@ describe "Authentication" do
         
         it { should have_success_message 'signed out' }
         it { should have_signin_link }
+        it { should_not have_link 'Profile',  href: user_path(user) }
+        it { should_not have_link 'Users',    href: users_path }
+        it { should_not have_link 'Settings', href: edit_user_path(user) }
+        it { should_not have_signout_link }
       end
     end
   end
@@ -79,6 +83,14 @@ describe "Authentication" do
           it 'should render the desired protected page' do
             expect(page).to have_title 'Edit user'
           end
+          
+          describe 'when signing in again' do
+            before do
+              click_link 'Sign out'
+              sign_in user
+            end
+            it { should have_title user.name }
+          end
         end
       end
     end
@@ -107,6 +119,34 @@ describe "Authentication" do
       
       describe 'submitting a DELETE request to the Users#destroy action' do
         before { delete user_path(user) }
+        specify { expect(response).to redirect_to(root_url) }
+      end
+      
+      describe 'submitting a PATCH request to become admin' do
+        let(:params) { { user: { admin: true, password: non_admin.password,
+                                 password_confirmation: non_admin.password } } }
+        before { patch user_path(non_admin), params }
+        specify { expect(non_admin.reload).not_to be_admin }
+      end
+    end
+    
+    describe 'as signed in user' do
+      create_user
+      before { sign_in user, no_capybara: true }
+      
+      describe "shouldn't be able to reach User#create action" do
+        let(:params) { { user: FactoryGirl.attributes_for(:user) } }
+        
+        specify { expect { post users_path, params }.not_to change(User, :count) }
+        
+        describe 'and should be redirected to root path' do
+          before { post users_path, params }
+          specify { expect(response).to redirect_to(root_url) }
+        end
+      end
+      
+      describe "shouldn't be able to reach User#new action" do
+        before { get new_user_path }
         specify { expect(response).to redirect_to(root_url) }
       end
     end
