@@ -1,9 +1,10 @@
 require 'spec_helper'
 
 describe User do
-  before { @user = User.new(name: "Example User", email: "user@example.com",
-                            password: 'ala123', password_confirmation: 'ala123') }
+  before  { @user = FactoryGirl.build(:user) }
   subject { @user }
+  
+  it { should have_many(:microposts).dependent(:destroy) }
   
   context "methods" do
     it { should respond_to(:name) }
@@ -14,6 +15,7 @@ describe User do
     it { should respond_to(:remember_token) }
     it { should respond_to(:authenticate) }
     it { should respond_to(:admin) }
+    it { should respond_to(:microposts) }
   end
 
   it { should be_valid }
@@ -27,7 +29,8 @@ describe User do
   
   context "email" do
     describe "when email format is invalid" do
-      addresses = %w[user@foo,com user_at_foo.org example.user@foo. foo@bar_baz.com foo@bar+baz.com foo@bar..com]
+      addresses = %w[user@foo,com user_at_foo.org example.user@foo.
+                     foo@bar_baz.com foo@bar+baz.com foo@bar..com]
       addresses.each do |invalid_address|
         it { should_not allow_value(invalid_address).for(:email) }
       end
@@ -101,5 +104,28 @@ describe User do
     end
     
     it { should be_admin }
+  end
+  
+  describe 'microposts association' do
+    before { @user.save }
+    let!(:older_micropost) do
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
+    end
+    let!(:newer_micropost) do
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
+    end
+    
+    its('microposts.to_a') { should eq [newer_micropost, older_micropost] }
+    
+    it "should destroy associated microposts" do
+      microposts = @user.microposts.to_a
+      @user.destroy
+      expect(microposts).not_to be_empty
+      microposts.each do |micropost|
+        expect do
+          Micropost.find(micropost)
+        end.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
   end
 end

@@ -14,4 +14,9 @@ FactoryGirl.define do
       email 'ala@ma.kota'
     end
   end
+  
+  factory :micropost do
+    content "Lorem ipsum"
+    user
+  end
 end
