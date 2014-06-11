@@ -17,6 +17,18 @@ describe "User pages" do
       it { should have_content "Microposts (#{user.microposts.count})" }
       it { should have_content m1.content }
       it { should have_content m2.content }
+      
+      describe 'created by another user' do
+        let(:another_user) { FactoryGirl.create(:user) }
+        before do
+          FactoryGirl.create(:micropost, user: another_user)
+          visit user_path(another_user)
+        end
+        
+        it "shouldn't have a delete link" do
+          expect(page).to_not have_link 'delete'
+        end
+      end
     end
   end
   

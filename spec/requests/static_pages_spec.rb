@@ -31,6 +31,23 @@ describe "Static pages" do
           expect(page).to have_selector "li##{post.id}", text: post.content
         end
       end
+      
+      describe 'feed pagination' do
+        describe 'with few microposts' do
+          it { should_not have_selector '.pagination'}
+        end
+        
+        describe 'with > 30 microposts' do
+          before do
+            31.times { FactoryGirl.create(:micropost, user: user) }
+            visit root_url
+          end
+          
+          it { should have_selector '.pagination' }
+        end
+      end
+      
+      it { should have_content '2 microposts' }
     end
   end
   
