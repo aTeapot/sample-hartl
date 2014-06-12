@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140609204907) do
+ActiveRecord::Schema.define(version: 20140612164355) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,17 @@ ActiveRecord::Schema.define(version: 20140609204907) do
   end
 
   add_index "microposts", ["user_id", "created_at"], name: "index_microposts_on_user_id_and_created_at", using: :btree
+
+  create_table "subscriptions", force: true do |t|
+    t.integer  "follower_id"
+    t.integer  "author_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "subscriptions", ["author_id"], name: "index_subscriptions_on_author_id", using: :btree
+  add_index "subscriptions", ["follower_id", "author_id"], name: "index_subscriptions_on_follower_id_and_author_id", unique: true, using: :btree
+  add_index "subscriptions", ["follower_id"], name: "index_subscriptions_on_follower_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "name"

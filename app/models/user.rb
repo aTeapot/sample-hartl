@@ -1,8 +1,13 @@
 class User < ActiveRecord::Base
   has_many :microposts, dependent: :destroy
+  has_many :subscriptions, foreign_key: :follower_id, dependent: :destroy
+  has_many :subscribers,   foreign_key: :author_id,
+                           class_name: Subscription,  dependent: :destroy
+  has_many :followed_users, through: :subscriptions, source: :author
+  has_many :followers,      through: :subscribers
   
   EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(?:\.[a-z\d\-]+)*\.[a-z]+\z/i
-  validates :name, presence: true, length: { maximum: 50 }
+  validates :name,  presence: true, length: { maximum: 50 }
   validates :email, presence: true,
                     uniqueness: { case_sensitive: false },
                     format: { with: EMAIL_REGEX }
@@ -24,6 +29,18 @@ class User < ActiveRecord::Base
   def feed
     # Micropost.where("user_id = ?", id)
     microposts
+  end
+  
+  def following?(other_user)
+    subscriptions.find_by(author_id: other_user.id)
+  end
+  
+  def follow!(other_user)
+    subscriptions.create!(author_id: other_user.id)
+  end
+  
+  def unfollow!(other_user)
+    subscriptions.find_by(author_id: other_user.id).destroy
   end
   
   private
