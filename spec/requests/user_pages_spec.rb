@@ -30,6 +30,56 @@ describe "User pages" do
         end
       end
     end
+    
+    describe 'follow/unfollow buttons' do
+      let(:author) { FactoryGirl.create(:user) }
+      before { sign_in user }
+      
+      describe "following a user" do
+        before { visit user_path(author) }
+        
+        it "should increment the followed users count" do
+          expect do
+            click_button 'Follow'
+          end.to change(user.followed_users, :count).by(1)
+        end
+        
+        it "should increment the author's followers count" do
+          expect do
+            click_button 'Follow'
+          end.to change(author.followers, :count).by(1)
+        end
+        
+        describe "toggling the button" do
+          before { click_button "Follow" }
+          it { should have_xpath "//input[@value='Unfollow']" }
+        end
+      end
+      
+      describe "unfollowing a user" do
+        before do
+          user.follow! author
+          visit user_path(author)
+        end
+        
+        it "should decrement the followed users count" do
+          expect do
+            click_button 'Unfollow'
+          end.to change(user.followed_users, :count).by(-1)
+        end
+        
+        it "should decrement the author's followers count" do
+          expect do
+            click_button 'Unfollow'
+          end.to change(author.followers, :count).by(-1)
+        end
+        
+        describe "toggling the button" do
+          before { click_button "Unfollow" }
+          it { should have_xpath "//input[@value='Follow']" }
+        end
+      end
+    end
   end
   
   describe "signup page" do
@@ -170,6 +220,23 @@ describe "User pages" do
           specify { expect(User.find_by id: admin.id).not_to be_nil }
         end
       end
+    end
+  end
+  
+  describe 'following/followers' do
+    let(:follower) { FactoryGirl.create(:user) }
+    let(:author)   { FactoryGirl.create(:user) }
+    before { follower.follow! author }
+    
+    describe 'followed users' do
+      before do
+        sign_in author
+        visit followers_user_path(author)
+      end
+      
+      it { should have_title full_title('Followers') }
+      it { should have_selector 'h3', text: 'Followers' }
+      it { should have_link follower.name, href: user_path(follower) }
     end
   end
 end
