@@ -4,12 +4,18 @@ class SubscriptionsController < ApplicationController
   def create
     @user = User.find(params[:subscription][:author_id])
     current_user.follow! @user
-    redirect_to @user
+    respond_to do |format|
+      format.html { redirect_to @user }
+      format.js
+    end
   end
   
   def destroy
     @user = Subscription.find(params[:id]).author
     current_user.unfollow! @user
-    redirect_to @user
+    respond_to do |format|
+      format.html { redirect_to @user }
+      format.js
+    end
   end
 end
