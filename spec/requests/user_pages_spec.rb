@@ -238,5 +238,21 @@ describe "User pages" do
       it { should have_selector 'h3', text: 'Followers' }
       it { should have_link follower.name, href: user_path(follower) }
     end
+    
+    describe "stats" do
+      describe "on author's profile page" do
+        before { visit user_path(author) }
+        it { should have_link '1 followers', href: followers_user_path(author) }
+        it { should have_link '0 following', href: following_user_path(author) }
+      end
+      
+      describe "on follower's profile page" do
+        before { visit user_path(follower) }
+        it { should have_link '0 followers',
+                              href: followers_user_path(follower) }
+        it { should have_link '1 following',
+                              href: following_user_path(follower) }
+      end
+    end
   end
 end

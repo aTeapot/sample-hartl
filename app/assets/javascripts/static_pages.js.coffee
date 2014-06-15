@@ -6,9 +6,6 @@ $(document).on 'focus', '#micropost_content', ->
   updateLeft()
   $('#characters-left').show()
 
-$(document).on 'blur', '#micropost_content', ->
-  $('#characters-left').hide()
-
 $(document).on 'keyup', '#micropost_content', ->
   updateLeft()
 

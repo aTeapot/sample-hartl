@@ -5,6 +5,8 @@ describe User do
   subject { @user }
   
   it { should have_many(:microposts).dependent(:destroy) }
+  it { should have_many(:subscriptions).dependent(:destroy) }
+  it { should have_many(:subscribers).dependent(:destroy) }
   
   context "methods" do
     it { should respond_to(:name) }
@@ -176,6 +178,27 @@ describe User do
       
       it { should_not be_following author }
       its(:followed_users) { should_not include author }
+    end
+    
+    # already covered with shoulda, just as exercise
+    describe "user destruction should destroy it's subscriptions" do
+      specify "when user is followed" do
+        subscriptions = author.subscribers.to_a
+        author.destroy
+        expect(subscriptions).not_to be_empty
+        subscriptions.each do |subscription|
+          expect(Subscription.where(id: subscription.id)).to be_empty
+        end
+      end
+      
+      specify "when user is a follower" do
+        subscriptions = @user.subscriptions.to_a
+        @user.destroy
+        expect(subscriptions).not_to be_empty
+        subscriptions.each do |subscription|
+          expect(Subscription.where(id: subscription.id)).to be_empty
+        end
+      end
     end
   end
 end

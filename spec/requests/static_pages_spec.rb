@@ -50,9 +50,9 @@ describe "Static pages" do
       end
       
       describe "follower/following stats" do
-        let(:other_user) { FactoryGirl.create(:user) }
+        let(:follower) { FactoryGirl.create(:user) }
         before do
-          other_user.follow! user
+          follower.follow! user
           visit root_path
         end
         
