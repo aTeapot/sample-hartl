@@ -18,14 +18,6 @@ class User < ActiveRecord::Base
   before_save { email.downcase! }
   before_create :create_remember_token
   
-  def User.new_remember_token
-    SecureRandom.urlsafe_base64
-  end
-  
-  def User.digest(token)
-    Digest::SHA1.hexdigest(token.to_s)
-  end
-  
   def feed
     Micropost.from_users_followed_by(self)
   end
@@ -41,6 +33,25 @@ class User < ActiveRecord::Base
   def unfollow!(other_user)
     subscriptions.find_by(author_id: other_user.id).destroy
   end
+  
+  class << self
+    def new_remember_token
+      SecureRandom.urlsafe_base64
+    end
+    
+    def digest(token)
+      Digest::SHA1.hexdigest(token.to_s)
+    end
+    
+    def search(search)
+      if search
+        where "LOWER(name) LIKE ?", "%#{search.strip.downcase}%"
+      else
+        all
+      end
+    end
+  end
+  
   
   private
   

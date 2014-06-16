@@ -1,9 +1,16 @@
-= provide :title, 'All users'
-%h1 All users
+= provide :title, @title
 
-= will_paginate
+.search= render 'shared/search'
 
-%ul.users
-  = render @users
+%h1= @title
 
-= will_paginate
+- if params[:search] and @users.empty?
+
+  .not_found No users found
+  
+- else
+
+  = will_paginate
+  %ul.users
+    = render @users
+  = will_paginate

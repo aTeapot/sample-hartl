@@ -26,7 +26,8 @@ class UsersController < ApplicationController
   end
   
   def index
-    @users = User.paginate(page: params[:page])
+    @title = params[:search].blank? ? 'All users' : 'Filtered users'
+    @users = User.search(params[:search]).paginate(page: params[:page])
   end
   
   def edit

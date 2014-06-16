@@ -221,6 +221,49 @@ describe "User pages" do
         end
       end
     end
+    
+    describe "search form" do
+      before do
+        user_names = ["Winnie-the-Pooh", "Alice in Wonderland", "Wonder Woman"]
+        user_names.each do |name|
+          FactoryGirl.create(:user, name: name)
+        end
+      end
+      
+      describe "valid search" do
+        before do
+          fill_in :search, with: 'woNder'
+          click_button 'Search'
+        end
+        
+        it { should have_content "Alice in Wonderland" }
+        it { should have_content "Wonder Woman" }
+        it { should_not have_content "Winnie-the-Pooh" }
+        it { should have_content "Filtered users" }
+        it { should_not have_content "All users" }
+        it { should have_selector "#search[value=woNder]" }
+      end
+      
+      describe "search with no results" do
+        before do
+          fill_in :search, with: 'qwerty'
+          click_button 'Search'
+        end
+        
+        it { should have_content "No users found" }
+        it { should_not have_selector ".users li" }
+      end
+      
+      describe "empty search" do
+        before do
+          fill_in 'search', with: '   '
+          click_button 'Search'
+        end
+        
+        it { should have_selector ".users li", count: User.count }
+        it { should have_content "All users" }
+      end
+    end
   end
   
   describe 'following/followers' do
