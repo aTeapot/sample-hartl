@@ -1,3 +1,5 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
+# don't submit blank form
+$(document).on 'click', '.search .btn', ->
+  if /^\s*$/.test($('#search').val())
+    $('#error').show()
+    false

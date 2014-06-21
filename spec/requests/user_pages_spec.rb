@@ -261,6 +261,7 @@ describe "User pages" do
         end
         
         it { should have_selector ".users li", count: User.count }
+        it { should have_selector "#error", text: "blank" }
         it { should have_content "All users" }
       end
     end
