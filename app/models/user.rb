@@ -22,6 +22,14 @@ class User < ActiveRecord::Base
     Micropost.from_users_followed_by(self)
   end
   
+  def filtered_microposts(phrase)
+    if phrase
+      microposts.where "LOWER(content) LIKE ?", "%#{phrase.strip.downcase}%"
+    else
+      microposts
+    end
+  end
+  
   def following?(other_user)
     subscriptions.find_by(author_id: other_user.id)
   end
@@ -43,9 +51,9 @@ class User < ActiveRecord::Base
       Digest::SHA1.hexdigest(token.to_s)
     end
     
-    def search(search)
-      if search
-        where "LOWER(name) LIKE ?", "%#{search.strip.downcase}%"
+    def search(phrase)
+      if phrase
+        where "LOWER(name) LIKE ?", "%#{phrase.strip.downcase}%"
       else
         all
       end

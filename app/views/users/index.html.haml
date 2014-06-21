@@ -1,15 +1,13 @@
 = provide :title, @title
 
-= render 'shared/search'
+= render 'shared/search', search_path: users_path
 
 %h1= @title
 
 - if params[:search] and @users.empty?
-
   .not_found No users found
   
 - else
-
   = will_paginate
   %ul.users
     = render @users

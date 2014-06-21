@@ -64,8 +64,8 @@ describe "Static pages" do
   
   describe "Help page" do
     before { visit help_path }
-    let(:heading)    {'Help'}
-    let(:page_title) {heading}
+    let(:heading)    { 'Help' }
+    let(:page_title) { heading }
     
     it_behaves_like 'static page'
   end
@@ -73,15 +73,19 @@ describe "Static pages" do
   describe "About page" do
     before { visit about_path }
     
-    let(:heading)    {'About Us'}
-    let(:page_title) {heading}
+    let(:heading)    { 'About Us' }
+    let(:page_title) { heading }
+    
+    it_behaves_like 'static page'
   end
   
   describe "Contact page" do
     before { visit contact_path }
     
-    let(:heading)    {'Contact'}
-    let(:page_title) {heading}
+    let(:heading)    { 'Contact' }
+    let(:page_title) { heading }
+    
+    it_behaves_like 'static page'
   end
   
   it "should have the right links on the layout" do

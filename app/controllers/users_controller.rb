@@ -22,11 +22,12 @@ class UsersController < ApplicationController
   end
   
   def show
-    @microposts = @user.microposts.paginate(page: params[:page])
+    filtered_microposts = @user.filtered_microposts(params[:search])
+    @microposts = filtered_microposts.paginate(page: params[:page])
   end
   
   def index
-    @title = params[:search].blank? ? 'All users' : 'Filtered users'
+    @title = params[:search].blank? ? 'All users' : 'Found users'
     @users = User.search(params[:search]).paginate(page: params[:page])
   end
   

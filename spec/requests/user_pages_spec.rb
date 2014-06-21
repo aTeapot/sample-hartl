@@ -6,8 +6,10 @@ describe "User pages" do
   
   describe 'profile page' do
     create_user
-    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: 'Foo') }
-    let!(:m2) { FactoryGirl.create(:micropost, user: user, content: 'Bar') }
+    microposts = %w(Lorem ipsum dolor)
+    microposts.each_with_index do |m, i|
+      let!("m#{i+1}") { FactoryGirl.create(:micropost, user: user, content: m) }
+    end
     before { visit user_path(user) }
     
     it { should have_content(user.name) }
@@ -19,16 +21,27 @@ describe "User pages" do
       it { should have_content m2.content }
       
       describe 'created by another user' do
-        let(:another_user) { FactoryGirl.create(:user) }
-        before do
-          FactoryGirl.create(:micropost, user: another_user)
-          visit user_path(another_user)
+        let!(:micropost) { FactoryGirl.create(:micropost) }
+        before { visit user_path(user) }   # refresh page
+        
+        it "shouldn't be on user's profile page" do
+          expect(page).to_not have_content micropost.content
         end
         
         it "shouldn't have a delete link" do
+          visit user_path(micropost.user)
           expect(page).to_not have_link 'delete'
         end
       end
+      
+      describe "search form" do
+        let(:collection_size) { user.microposts.count }
+        let(:search_texts) { {phrase: 'loR', found1: "Lorem",
+                              found2: "dolor", not_found: "ipsum"} }
+        
+        it_behaves_like "search form", 'microposts'
+      end
+      
     end
     
     describe 'follow/unfollow buttons' do
@@ -230,40 +243,11 @@ describe "User pages" do
         end
       end
       
-      describe "valid search" do
-        before do
-          fill_in :search, with: 'woNder'
-          click_button 'Search'
-        end
-        
-        it { should have_content "Alice in Wonderland" }
-        it { should have_content "Wonder Woman" }
-        it { should_not have_content "Winnie-the-Pooh" }
-        it { should have_content "Filtered users" }
-        it { should_not have_content "All users" }
-        it { should have_selector "#search[value=woNder]" }
-      end
+      let(:collection_size) { User.count }
+      let(:search_texts) { {phrase: 'woNder', found1: "Alice in Wonderland",
+                            found2: "Wonder Woman", not_found: "Winnie-the-Pooh"} }
       
-      describe "search with no results" do
-        before do
-          fill_in :search, with: 'qwerty'
-          click_button 'Search'
-        end
-        
-        it { should have_content "No users found" }
-        it { should_not have_selector ".users li" }
-      end
-      
-      describe "empty search" do
-        before do
-          fill_in 'search', with: '   '
-          click_button 'Search'
-        end
-        
-        it { should have_selector ".users li", count: User.count }
-        it { should have_selector "#error", text: "blank" }
-        it { should have_content "All users" }
-      end
+      it_behaves_like "search form", 'users'
     end
   end
   

@@ -25,6 +25,11 @@ def fill_in_user_form(user)
   fill_in "Confirmation", with: user.password
 end
 
+def submit_search(search_text)
+  fill_in :search, with: search_text
+  click_button 'Search'
+end
+
 flashes = [:success, :error, :notice]
 
 flashes.each do |type|
