@@ -15,4 +15,8 @@ module UsersHelper
       "Found microposts (#{microposts.count})"
     end
   end
+  
+  def microposts_count(user)
+    pluralize(user.microposts.count, 'micropost')
+  end
 end

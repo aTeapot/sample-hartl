@@ -3,11 +3,6 @@ require 'spec_helper'
 describe "Static pages" do
   
   subject { page }
-  
-  shared_examples_for 'static page' do
-    it { should have_selector('h1', text: heading) }
-    it { should have_title(full_title(page_title)) }
-  end
 
   describe "Home page" do
     before { visit root_path }
@@ -102,6 +97,4 @@ describe "Static pages" do
     click_link "sample app"
     expect(page).to have_title(full_title)
   end
-  
-  
 end

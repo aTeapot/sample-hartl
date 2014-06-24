@@ -1,0 +1,19 @@
+$('#error_explanation').remove()
+$('.alert-success').remove()
+
+<% unless @micropost.new_record? %>
+  if ($('.microposts').length === 0)
+    $('#feed').append("<ol class='microposts'>")
+    
+  var micropost = "<%= render_js 'shared/feed_item', feed_item: @micropost %>"
+  var alert = "<div class='alert alert-success'>Micropost created</div>"
+  $('.microposts').prepend(micropost)
+  $('#micropost_content').val('')
+  $('#characters-left').hide()
+  $('#microposts_count').html("<%= microposts_count(@micropost.user) %>")
+  $('body > .container').prepend(alert)
+  
+<% else %>
+  var errorMsg = "<%= render_js 'shared/error_messages', object: @micropost %>"
+  $('#new_micropost').prepend(errorMsg)
+<% end %>
