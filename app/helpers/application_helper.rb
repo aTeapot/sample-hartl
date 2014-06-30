@@ -9,4 +9,8 @@ module ApplicationHelper
   def render_js(*args)
     escape_javascript(render(*args))
   end
+  
+  def alert(type, msg)
+    content_tag(:div, msg, class: "alert alert-#{type}")
+  end
 end

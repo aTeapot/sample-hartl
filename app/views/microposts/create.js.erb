@@ -6,7 +6,7 @@ $('.alert-success').remove()
     $('#feed').append("<ol class='microposts'>")
     
   var micropost = "<%= render_js 'shared/feed_item', feed_item: @micropost %>"
-  var alert = "<div class='alert alert-success'>Micropost created</div>"
+  var alert = "<%= escape_javascript alert(:success, 'Micropost created') %>"
   $('.microposts').prepend(micropost)
   $('#micropost_content').val('')
   $('#characters-left').hide()
