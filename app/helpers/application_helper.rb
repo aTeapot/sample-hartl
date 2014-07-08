@@ -10,7 +10,7 @@ module ApplicationHelper
     escape_javascript(render(*args))
   end
   
-  def alert(type, msg)
+  def alert_box(type, msg)
     content_tag(:div, msg, class: "alert alert-#{type}")
   end
 end
